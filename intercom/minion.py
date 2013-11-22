@@ -63,5 +63,16 @@ class Minion:
 
 
 if __name__ == '__main__':
-    m = Minion(('',), 'tcp://localhost:5555')
+
+    # Obtaining optional hostname from CLI:
+    import sys
+    if len(sys.argv) > 1:
+        host = sys.argv[1]
+    else:
+        host = 'localhost'
+    if ':' not in host:
+        host += ':5555'
+
+
+    m = Minion(('',), 'tcp://' + host)
     m.run()

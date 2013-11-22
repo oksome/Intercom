@@ -67,6 +67,8 @@ class SampleController(Controller):
         self.send(topic, msg)
 
 if __name__ == '__main__':
+    
+    # Obtaining optional hostname from CLI:
     import sys
     if len(sys.argv) > 1:
         host = sys.argv[1]

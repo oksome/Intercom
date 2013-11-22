@@ -21,50 +21,48 @@
 A Controller sends commands to Minions via the Intercom.
 '''
 
-import zmq
-import json
+import os
 import time
 
-
-def dump(string):
-    return bytes(json.dumps(string), 'utf-8')
+from intercom.controller import dump, Controller
 
 
-class Controller:
+class KeystrokesController(Controller):
 
-    def __init__(self, name, intercom='tcp://localhost:5556'):
-        self.name = name
-        self.intercom = intercom
-        self.reset()
-
-    def reset(self):
-        self.context = zmq.Context()
-
-    def send(self, topic, msg):
-        if type(topic) != bytes:
-            topic = bytes(str(topic), 'utf-8')
-        messagedata = bytes(json.dumps(msg), 'utf-8')
-
-        socket = self.context.socket(zmq.REQ)
-        socket.connect(self.intercom)
-        socket.send(topic + b' ' + messagedata)
-        #print(topic + b' ' + messagedata)
-        reply = socket.recv()
-        #print('Reply:', reply)
-
-
-class SampleController(Controller):
-
-    def do(self, action):
+    def do(self, group, plug, action):
         topic = 'do:arduino.switch'
 
         msg = {'origin': self.name,
-               'group': '00011',
-               'plug': '10000',
+               'group': group,
+               'plug': plug,
                'action': action,
                }
-        print('Sending:', topic, msg)
+
         self.send(topic, msg)
+
+
+def main(screen):
+    curses.noecho()
+    controller = KeystrokesController(os.uname().nodename + '/keystrokes', 'tcp://' + host)
+    codes = {'k': ('00011', '10000', 'on'),
+             'l': ('00011', '10000', 'off'),
+             'b': ('00001', '10000', 'on'),
+             'n': ('00001', '10000', 'off'),
+             }
+    while 1:
+        c = screen.getch()
+        cc = chr(c)
+        screen.addstr(2, 2, str([c]))
+
+        if cc in codes:
+            controller.do(*codes[cc])
+        elif cc == 'q':
+            break
+        else:
+            screen.addstr(4, 2, 'Unknown')
+        
+
+    curses.endwin()
 
 if __name__ == '__main__':
     
@@ -77,11 +75,5 @@ if __name__ == '__main__':
     if ':' not in host:
         host += ':5556'
 
-    c = SampleController('bob', 'tcp://' + host)
-    while True:
-        print('on')
-        c.do('on')
-        time.sleep(1)
-        print('off')
-        c.do('off')
-        time.sleep(1)
+    import curses
+    curses.wrapper(main)

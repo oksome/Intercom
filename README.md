@@ -1,4 +1,4 @@
 Intercom
-========
+--------
 
-Messaging system for Home automation
+A daemon and it's minions used for managing you Home. They communicate using ZeroMQ and are built in Python.

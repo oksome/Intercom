@@ -37,9 +37,12 @@ class PCMinion(Minion):
 
     def receive(self, topic, msg):
         print(topic, msg)
-        if 'action' in msg:
-            if 'topic' == 'do:pc.suspend':
-                os.system('sudo pm-suspend')
+        if topic == 'do:pc.suspend':
+            print('Suspending...')
+            #os.system('sudo pm-suspend')
+        else:
+            print('Unknown topic')
+            
 
 
 if __name__ == '__main__':

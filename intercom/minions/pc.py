@@ -39,7 +39,7 @@ class PCMinion(Minion):
         print(topic, msg)
         if topic == 'do:pc.suspend':
             print('Suspending...')
-            #os.system('sudo pm-suspend')
+            os.system('sudo pm-suspend')
         else:
             print('Unknown topic')
             

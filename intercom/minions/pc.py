@@ -23,6 +23,8 @@ echo "%power    ALL=(ALL) NOPASSWD:/usr/sbin/pm-suspend" >> /etc/sudoers.d/power
 
 '''
 
+import os
+
 from intercom.minion import Minion
 
 

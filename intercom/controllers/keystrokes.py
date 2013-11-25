@@ -56,10 +56,12 @@ def main(screen):
 
         if cc in codes:
             controller.do(*codes[cc])
+        elif cc == 'S':
+            controller.send('do:pc.suspend', {'origin': controller.name})
         elif cc == 'q':
             break
         else:
-            screen.addstr(4, 2, 'Unknown')
+            screen.addstr(4, 2, 'Unknown {}'.format(cc))
         
 
     curses.endwin()

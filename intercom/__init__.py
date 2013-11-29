@@ -17,6 +17,6 @@
 
 __author__ = 'OKso http://okso.me'
 
-from .intercom import Intercom
+from .relay import Relay
 from .controller import Controller
 from .minion import Minion

@@ -36,6 +36,7 @@ class ArduinoMinion(Minion):
         self.serial = serial.Serial('/dev/ttyUSB0')
 
     def receive(self, topic, msg):
+        print(topic, msg)
         if 'action' in msg:
             switch_group = bytes('n' + msg['group'], 'utf-8')
             switch_plug = bytes('p' + msg['plug'], 'utf-8')
@@ -47,6 +48,7 @@ class ArduinoMinion(Minion):
             print('Unknown: ', msg)
 
 if __name__ == '__main__':
-    m = ArduinoMinion(('do:arduino.switch', 'do:arduino.read'), 'tcp://localhost:5560')
+    #m = ArduinoMinion(('do:arduino.switch', 'do:arduino.read'), 'tcp://relay.intercom:5560')
+    m = ArduinoMinion(('', 'do:arduino.switch', 'do:arduino.read'), 'tcp://relay.intercom:5555')
     m.run()
 

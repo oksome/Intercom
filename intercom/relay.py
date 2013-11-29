@@ -18,13 +18,13 @@
 # DESIGNED FOR Python 3
 
 '''
-The Intercom lets Controllers and Minions talk to each other.
+The Relay lets Controllers and Minions talk to each other.
 '''
 
 import zmq
 
 
-class Intercom:
+class Relay:
 
     def __init__(self):
         self.reset()
@@ -48,5 +48,5 @@ class Intercom:
             self.backend.send(msg)
 
 if __name__ == '__main__':
-    i = Intercom()
+    i = Relay()
     i.run()

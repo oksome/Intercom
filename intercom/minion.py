@@ -31,7 +31,7 @@ class Minion:
     Inherit your Minions from this class.
     '''
 
-    def __init__(self, topics, intercom='tcp://localhost:5555'):
+    def __init__(self, topics, intercom='tcp://relay.intercom:5555'):
         self.topics = topics
         self.intercom = intercom
         self.reset()
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         host = sys.argv[1]
     else:
-        host = 'localhost'
+        host = 'relay.intercom'
     if ':' not in host:
         host += ':5555'
 

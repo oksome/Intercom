@@ -48,6 +48,8 @@ def main(screen):
              'l': ('00011', '10000', 'off'),
              'b': ('00001', '10000', 'on'),
              'n': ('00001', '10000', 'off'),
+             'd': ('00001', '00010', 'on'),
+             'f': ('00001', '00010', 'off'),
              }
     while 1:
         c = screen.getch()
@@ -73,7 +75,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         host = sys.argv[1]
     else:
-        host = 'localhost'
+        host = 'relay.intercom'
     if ':' not in host:
         host += ':5556'
 

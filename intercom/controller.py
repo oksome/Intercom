@@ -32,7 +32,7 @@ def dump(string):
 
 class Controller:
 
-    def __init__(self, name, intercom='tcp://localhost:5556'):
+    def __init__(self, name, intercom='tcp://relay.intercom:5556'):
         self.name = name
         self.intercom = intercom
         self.reset()
@@ -73,7 +73,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         host = sys.argv[1]
     else:
-        host = 'localhost'
+        host = 'relay.intercom'
     if ':' not in host:
         host += ':5556'
 

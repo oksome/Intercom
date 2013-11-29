@@ -54,7 +54,7 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         host = sys.argv[1]
     else:
-        host = 'localhost'
+        host = 'relay.intercom'
     if ':' not in host:
         host += ':5555'
 

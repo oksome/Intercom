@@ -58,6 +58,10 @@ def main(screen):
 
         if cc in codes:
             controller.do(*codes[cc])
+        elif cc == 'p':
+            controller.send('do:mpd.play', {})
+        elif cc == 'P':
+            controller.send('do:mpd.pause', {})
         elif cc == 'S':
             controller.send('do:pc.suspend', {'origin': controller.name})
         elif cc == 'q':

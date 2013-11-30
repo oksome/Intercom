@@ -19,6 +19,7 @@
 
 '''
 For suspend to work, you need to:
+Add yourself to the 'power' group.
 echo "%power    ALL=(ALL) NOPASSWD:/usr/sbin/pm-suspend" >> /etc/sudoers.d/power
 
 '''

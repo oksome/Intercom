@@ -22,6 +22,7 @@ A Minion is an network endnode, connected to some input/output gadgets.
 '''
 
 import serial
+import time
 
 from intercom.minion import Minion
 
@@ -33,7 +34,10 @@ class ArduinoMinion(Minion):
 
     def __init__(self, topics, intercom):
         super(ArduinoMinion, self).__init__(topics, intercom)
-        self.serial = serial.Serial('/dev/ttyUSB0')
+        self.setup()
+
+    def setup(self):
+        self.serial = serial.Serial('/dev/ttyUSB1')
 
     def receive(self, topic, msg):
         print(topic, msg)
@@ -43,12 +47,17 @@ class ArduinoMinion(Minion):
             instruction = {'on': b'w1', 'off': b'w0'}[msg['action']]
 
             print(switch_group + switch_plug + instruction)
-            self.serial.write(switch_group + switch_plug + instruction)
+            try:
+                self.serial.write(switch_group + switch_plug + instruction)
+            except serial.serialutil.SerialException as e:
+                print('Exception:', e)
+                self.setup()
+                time.sleep(0.5)
+                self.serial.write(switch_group + switch_plug + instruction)
         else:
             print('Unknown: ', msg)
 
 if __name__ == '__main__':
-    #m = ArduinoMinion(('do:arduino.switch', 'do:arduino.read'), 'tcp://relay.intercom:5560')
     m = ArduinoMinion(('', 'do:arduino.switch', 'do:arduino.read'), 'tcp://relay.intercom:5555')
     m.run()
 

@@ -18,45 +18,34 @@
 # DESIGNED FOR Python 3
 
 '''
-This Minion is meant to control MPD, the Music Player Daemon.
+This Minion is meant to control things from accelerometer data.
 '''
 
-import os
 from intercom.minion2 import Minion
+
+from mpd import MPDClient
+
+mpc = MPDClient()
+mpc.connect("ra.ion", 6600)
+
+
+def mpdControl(measure):
+    x, y, z = measure['x'], measure['y'], measure['z']
+    x2 = 64 - x
+    #print('V', x2)
+    if x2 > 0:
+        # command = 'mpc volume {}'.format(int(x2 * 1.5))
+        #print('LOL: [{}]'.format(command))
+        # os.system(command)
+        mpc.setvol(int(x2 * 1.5))
 
 minion = Minion('minion.mpd')
 
 
-@minion.register('do:mpd.play')
-def play(topic, msg):
-    os.system('mpc play')
-
-
-@minion.register('do:mpd.pause')
-def pause(topic, msg):
-    os.system('mpc pause')
-
-
-@minion.register('do:mpd.next')
-def next(topic, msg):
-    os.system('mpc next')
-
-
-@minion.register('do:mpd.prev')
-def prev(topic, msg):
-    os.system('mpc prev')
-
-
-@minion.register('discover.minion')
-def discover(topic, msg):
-    actions = 'play', 'pause', 'prev', 'next'
-    minion.announce([
-        {'type': 'action',
-         'label': action.capitalize(),
-         'topic': 'do:mpd.{}'.format(action),
-         }
-        for action in actions
-        ])
+@minion.register('sensor:accelerometer')
+def accelerometer(topic, msg):
+    values = msg['values']
+    mpdControl(values)
 
 
 if __name__ == '__main__':

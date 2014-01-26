@@ -37,7 +37,11 @@ class ArduinoMinion(Minion):
         self.setup()
 
     def setup(self):
-        self.serial = serial.Serial('/dev/ttyUSB1')
+        try:
+            self.serial = serial.Serial('/dev/ttyUSB0')
+        except serial.serialutil.SerialException:
+            self.serial = serial.Serial('/dev/ttyUSB1')
+
 
     def receive(self, topic, msg):
         print(topic, msg)

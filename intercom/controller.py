@@ -32,9 +32,9 @@ def dump(string):
 
 class Controller:
 
-    def __init__(self, name, intercom='tcp://relay.intercom:5556'):
+    def __init__(self, name, relay='tcp://relay.intercom:5556'):
         self.name = name
-        self.intercom = intercom
+        self.rel = relay
         self.reset()
 
     def reset(self):
@@ -46,11 +46,10 @@ class Controller:
         messagedata = bytes(json.dumps(msg), 'utf-8')
 
         socket = self.context.socket(zmq.REQ)
-        socket.connect(self.intercom)
+        socket.connect(self.relay)
         socket.send(topic + b' ' + messagedata)
-        #print(topic + b' ' + messagedata)
         reply = socket.recv()
-        #print('Reply:', reply)
+        assert reply
 
 
 class SampleController(Controller):

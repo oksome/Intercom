@@ -32,7 +32,6 @@ class Minion:
         self._registrations = {}
 
     def register(self, topic):
-        print('register', topic)
         def decorator(function):
             if topic in self._registrations:
                 self._registrations[topic].append(function)
@@ -41,18 +40,14 @@ class Minion:
         return decorator
 
     def setup(self, relay):
-        print('setup', relay)
         # Socket to talk to server
         context = zmq.Context()
         self.socket = context.socket(zmq.SUB)
-        print("Collecting updates from server...")
         self.socket.connect(relay)
         for topic in self._registrations:
-            print('topic', topic)
             self.socket.setsockopt(zmq.SUBSCRIBE, bytes(topic, 'utf-8'))
 
     def receive(self, topic, msg):
-        print('receive', topic, msg)
         for t in self._registrations:
             if t.startswith(topic):
                 for f in self._registrations[t]:
@@ -67,10 +62,8 @@ class Minion:
         socket = context.socket(zmq.REQ)
         socket.connect(self._relay_in)
         socket.send(topic + b' ' + messagedata)
-        #print(topic + b' ' + messagedata)
         reply = socket.recv()
         assert reply
-        #print('Reply:', reply)
 
     def announce(self, capabilities):
         msg = {

@@ -46,5 +46,4 @@ def discover(topic, msg):
 
 
 if __name__ == '__main__':
-    print('reg', minion._registrations)
     minion.run()

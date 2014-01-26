@@ -18,29 +18,46 @@
 # DESIGNED FOR Python 3
 
 '''
-A Controller sends commands to Minions via the Intercom.
+This Minion is meant to control MPD, the Music Player Daemon.
 '''
 
 import os
-import time
-import random
-import json
+from intercom.minion2 import Minion
 
-from intercom.controller import Controller
+minion = Minion('minion.mpd')
 
 
-def main():
-    controller = Controller('terminal')
-    while True:
-        user_input = input(random.choice(('(^-^)', '(^_~)', '(^_-)', '(O.O)', '(^o^)')) + ' ')
-        # Validation:
-        try:
-            instruction, args = user_input.split(' ', 1)
-            msg = json.loads(args)
-            controller.send(instruction, msg)
-        except ValueError as e:
-            print('Wrong format, {}'.format(e))
-            continue
+@minion.register('do:mpd.play')
+def play(topic, msg):
+    os.system('mpc play')
+
+
+@minion.register('do:mpd.pause')
+def pause(topic, msg):
+    os.system('mpc pause')
+
+
+@minion.register('do:mpd.next')
+def next(topic, msg):
+    os.system('mpc next')
+
+
+@minion.register('do:mpd.prev')
+def prev(topic, msg):
+    os.system('mpc prev')
+
+
+@minion.register('discover.minion')
+def discover(topic, msg):
+    actions = 'play', 'pause', 'prev', 'next'
+    minion.announce([
+        {'type': 'action',
+         'label': action.capitalize(),
+         'topic': 'do:mpd.{}'.format(action),
+         }
+        for action in actions
+        ])
+
 
 if __name__ == '__main__':
-    main()
+    minion.run()

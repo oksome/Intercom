@@ -18,47 +18,33 @@
 # DESIGNED FOR Python 3
 
 '''
-For suspend to work, you need to:
-Add yourself to the 'power' group.
-echo "%power    ALL=(ALL) NOPASSWD:/usr/sbin/pm-suspend" >> /etc/sudoers.d/power
+This Minion is meant to run on a personal computer running Linux or similar.
+It can be used to suspend the computer.
 
+For suspend to work, you need to:
+echo "%power    ALL=(ALL) NOPASSWD:/usr/sbin/pm-suspend" >> /etc/sudoers.d/power
 '''
 
 import os
+from intercom.minion2 import Minion
 
-from intercom.minion import Minion
+minion = Minion('minion.pc')
 
 
-class MPDMinion(Minion):
-    '''
-    This Minion is meant to control MPD, the Music Player Daemon.
-    '''
+@minion.register('do:pc.suspend')
+def suspend(topic, msg):
+    print('Suspending...')
+    os.system('sudo pm-suspend')
 
-    def __init__(self, topics, intercom):
-        super(MPDMinion, self).__init__(topics, intercom)
 
-    def receive(self, topic, msg):
-        print(topic, msg)
-
-        if topic == 'do:mpd.play':
-            os.system('mpc play')
-        if topic == 'do:mpd.pause':
-            os.system('mpc pause')
-        else:
-            print('Unknown topic')
-            
+@minion.register('discover.minion')
+def discover(topic, msg):
+    minion.announce([{
+        'type': 'action',
+        'label': 'Suspend',
+        'topic': 'do:pc.suspend',
+        }])
 
 
 if __name__ == '__main__':
-
-    # Obtaining optional hostname from CLI:
-    import sys
-    if len(sys.argv) > 1:
-        host = sys.argv[1]
-    else:
-        host = 'relay.intercom'
-    if ':' not in host:
-        host += ':5555'
-
-    m = MPDMinion(('do:mpd',), 'tcp://' + host)
-    m.run()
+    minion.run()

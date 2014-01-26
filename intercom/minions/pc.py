@@ -48,15 +48,5 @@ class PCMinion(Minion):
 
 
 if __name__ == '__main__':
-
-    # Obtaining optional hostname from CLI:
-    import sys
-    if len(sys.argv) > 1:
-        host = sys.argv[1]
-    else:
-        host = 'relay.intercom'
-    if ':' not in host:
-        host += ':5555'
-
     m = PCMinion(('do:pc.suspend',), 'tcp://' + host)
     m.run()

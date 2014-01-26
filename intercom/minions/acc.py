@@ -18,29 +18,35 @@
 # DESIGNED FOR Python 3
 
 '''
-A Controller sends commands to Minions via the Intercom.
+This Minion is meant to control things from accelerometer data.
 '''
 
-import os
-import time
-import random
-import json
+from intercom.minion2 import Minion
 
-from intercom.controller import Controller
+from mpd import MPDClient
+
+mpc = MPDClient()
+mpc.connect("ra.ion", 6600)
 
 
-def main():
-    controller = Controller('terminal')
-    while True:
-        user_input = input(random.choice(('(^-^)', '(^_~)', '(^_-)', '(O.O)', '(^o^)')) + ' ')
-        # Validation:
-        try:
-            instruction, args = user_input.split(' ', 1)
-            msg = json.loads(args)
-            controller.send(instruction, msg)
-        except ValueError as e:
-            print('Wrong format, {}'.format(e))
-            continue
+def mpdControl(measure):
+    x, y, z = measure['x'], measure['y'], measure['z']
+    x2 = 64 - x
+    #print('V', x2)
+    if x2 > 0:
+        # command = 'mpc volume {}'.format(int(x2 * 1.5))
+        #print('LOL: [{}]'.format(command))
+        # os.system(command)
+        mpc.setvol(int(x2 * 1.5))
+
+minion = Minion('minion.mpd')
+
+
+@minion.register('sensor:accelerometer')
+def accelerometer(topic, msg):
+    values = msg['values']
+    mpdControl(values)
+
 
 if __name__ == '__main__':
-    main()
+    minion.run()

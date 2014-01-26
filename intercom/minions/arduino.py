@@ -62,6 +62,6 @@ class ArduinoMinion(Minion):
             print('Unknown: ', msg)
 
 if __name__ == '__main__':
-    m = ArduinoMinion(('', 'do:arduino.switch', 'do:arduino.read'), 'tcp://relay.intercom:5555')
+    m = ArduinoMinion(('', 'do:arduino.switch', 'do:arduino.read'))
     m.run()
 

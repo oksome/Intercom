@@ -55,7 +55,7 @@ def discover(topic, msg):
          'label': action.capitalize(),
          'topic': 'do:mpd.{}'.format(action),
          }
-         for action in actions
+        for action in actions
         ])
 
 

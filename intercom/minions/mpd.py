@@ -49,15 +49,13 @@ def prev(topic, msg):
 
 @minion.register('discover.minion')
 def discover(topic, msg):
+    actions = 'play', 'pause', 'prev', 'next'
     minion.announce([
         {'type': 'action',
-         'label': 'Play',
-         'topic': 'do:mpd.play',
-         },
-        {'type': 'action',
-         'label': 'Pause',
-         'topic': 'do:mpd.pause',
-         },
+         'label': action.capitalize(),
+         'topic': 'do:mpd.{}'.format(action),
+         }
+         for action in actions
         ])
 
 

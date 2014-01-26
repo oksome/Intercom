@@ -50,5 +50,5 @@ class MPDMinion(Minion):
 
 
 if __name__ == '__main__':
-    m = MPDMinion(('do:mpd',), 'tcp://' + host)
+    m = MPDMinion(('do:mpd',))
     m.run()

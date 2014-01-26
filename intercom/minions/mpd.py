@@ -18,37 +18,48 @@
 # DESIGNED FOR Python 3
 
 '''
-For suspend to work, you need to:
-Add yourself to the 'power' group.
-echo "%power    ALL=(ALL) NOPASSWD:/usr/sbin/pm-suspend" >> /etc/sudoers.d/power
-
+This Minion is meant to control MPD, the Music Player Daemon.
 '''
 
 import os
+from intercom.minion2 import Minion
 
-from intercom.minion import Minion
+minion = Minion('minion.mpd')
 
 
-class MPDMinion(Minion):
-    '''
-    This Minion is meant to control MPD, the Music Player Daemon.
-    '''
+@minion.register('do:mpd.play')
+def play(topic, msg):
+    os.system('mpc play')
 
-    def __init__(self, topics, intercom):
-        super(MPDMinion, self).__init__(topics, intercom)
 
-    def receive(self, topic, msg):
-        print(topic, msg)
+@minion.register('do:mpd.pause')
+def pause(topic, msg):
+    os.system('mpc pause')
 
-        if topic == 'do:mpd.play':
-            os.system('mpc play')
-        if topic == 'do:mpd.pause':
-            os.system('mpc pause')
-        else:
-            print('Unknown topic')
-            
+
+@minion.register('do:mpd.next')
+def next(topic, msg):
+    os.system('mpc next')
+
+
+@minion.register('do:mpd.prev')
+def prev(topic, msg):
+    os.system('mpc prev')
+
+
+@minion.register('discover.minion')
+def discover(topic, msg):
+    minion.announce([
+        {'type': 'action',
+         'label': 'Play',
+         'topic': 'do:mpd.play',
+         },
+        {'type': 'action',
+         'label': 'Pause',
+         'topic': 'do:mpd.pause',
+         },
+        ])
 
 
 if __name__ == '__main__':
-    m = MPDMinion(('do:mpd',))
-    m.run()
+    minion.run()

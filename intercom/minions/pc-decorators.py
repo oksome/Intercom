@@ -39,10 +39,10 @@ def suspend(topic, msg):
 
 @minion.register('discover.minion')
 def discover(topic, msg):
-    minion.announce({
+    minion.announce([{
         'type': 'action',
         'label': 'Suspend',
-        })
+        }])
 
 
 if __name__ == '__main__':

@@ -37,6 +37,7 @@ class Minion:
                 self._registrations[topic].append(function)
             else:
                 self._registrations[topic] = [function]
+            return function
         return decorator
 
     def setup(self, relay):
@@ -48,10 +49,14 @@ class Minion:
             self.socket.setsockopt(zmq.SUBSCRIBE, bytes(topic, 'utf-8'))
 
     def receive(self, topic, msg):
-        for t in self._registrations:
-            if t.startswith(topic):
-                for f in self._registrations[t]:
-                    f(topic, msg)
+        # Exclusive mode:
+        for f in self._registrations.get(topic, []):
+            f(topic, msg)
+        # Non-exclusive mode:
+        # for t in self._registrations:
+        #     if topic.startswith(t):
+        #         for f in self._registrations[t]:
+        #             f(topic, msg)
 
     def send(self, topic, msg):
         if type(topic) != bytes:
@@ -68,8 +73,8 @@ class Minion:
     def announce(self, capabilities):
         msg = {
             'name': self._name,
+            'capabilities': capabilities
         }
-        msg.update(capabilities)
         self.send('announce.minion', msg)
 
     def run(self,

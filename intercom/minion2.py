@@ -26,8 +26,9 @@ import json
 
 
 class Minion:
-    
-    def __init__(self):
+
+    def __init__(self, name):
+        self._name = name
         self._registrations = {}
 
     def register(self, topic):
@@ -57,12 +58,36 @@ class Minion:
                 for f in self._registrations[t]:
                     f(topic, msg)
 
-    def run(self, relay='tcp://relay.intercom:5555'):
-        self.setup(relay)
+    def send(self, topic, msg):
+        if type(topic) != bytes:
+            topic = bytes(str(topic), 'utf-8')
+        messagedata = bytes(json.dumps(msg), 'utf-8')
+
+        context = zmq.Context()
+        socket = context.socket(zmq.REQ)
+        socket.connect(self._relay_in)
+        socket.send(topic + b' ' + messagedata)
+        #print(topic + b' ' + messagedata)
+        reply = socket.recv()
+        assert reply
+        #print('Reply:', reply)
+
+    def announce(self, capabilities):
+        msg = {
+            'name': self._name,
+        }
+        msg.update(capabilities)
+        self.send('announce.minion', msg)
+
+    def run(self,
+            relay_out='tcp://relay.intercom:5555',
+            relay_in='tcp://relay.intercom:5556'):
+        self.setup(relay_out)
+        self._relay_in = relay_in
+
         while True:
             string = self.socket.recv()
             topic, messagedata = string.split(b' ', 1)
             topic = str(topic, 'utf-8')
             msg = json.loads(str(messagedata, 'utf-8'))
             self.receive(topic, msg)
-

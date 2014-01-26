@@ -26,7 +26,7 @@ import time
 import random
 import json
 
-from intercom.controller import dump, Controller
+from intercom.controller import Controller
 
 
 def main():

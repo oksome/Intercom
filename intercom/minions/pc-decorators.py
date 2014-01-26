@@ -28,14 +28,23 @@ echo "%power    ALL=(ALL) NOPASSWD:/usr/sbin/pm-suspend" >> /etc/sudoers.d/power
 import os
 from intercom.minion2 import Minion
 
-minion = Minion()
+minion = Minion('minion.pc')
+
 
 @minion.register('do:pc.suspend')
 def suspend(topic, msg):
     print('Suspending...')
-    #os.system('sudo pm-suspend')
+    os.system('sudo pm-suspend')
+
+
+@minion.register('discover.minion')
+def discover(topic, msg):
+    minion.announce({
+        'type': 'action',
+        'label': 'Suspend',
+        })
+
 
 if __name__ == '__main__':
     print('reg', minion._registrations)
     minion.run()
-

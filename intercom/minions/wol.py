@@ -57,6 +57,5 @@ class WOLMinion(Minion):
 
 
 if __name__ == '__main__':
-
     m = WOLMinion(('do:net.wol',))
     m.run()

@@ -42,6 +42,7 @@ def discover(topic, msg):
     minion.announce([{
         'type': 'action',
         'label': 'Suspend',
+        'topic': 'do:pc.suspend',
         }])
 
 

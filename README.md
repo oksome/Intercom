@@ -52,7 +52,6 @@ from intercom.minion2 import Minion
 
 minion = Minion('minion.pc')
 
-
 @minion.register('do:test.print')
 def test_print(topic, msg):
     print('This is some text:')

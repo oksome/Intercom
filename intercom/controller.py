@@ -34,7 +34,7 @@ class Controller:
 
     def __init__(self, name, relay='tcp://relay.intercom:5556'):
         self.name = name
-        self.rel = relay
+        self.relay = relay
         self.reset()
 
     def reset(self):

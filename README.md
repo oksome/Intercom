@@ -42,3 +42,22 @@ python myminion.py
 ```
 
 You will find example of minions in `Intercom/intercom/minions/`.
+
+## Writing a Minion
+
+The following Minion will just print a text on the terminal:
+
+```python
+from intercom.minion2 import Minion
+
+minion = Minion('minion.pc')
+
+
+@minion.register('do:test.print')
+def test_print(topic, msg):
+    print('This is some text:')
+    print(msg.get('text', ''))
+
+if __name__ == '__main__':
+    minion.run()
+```

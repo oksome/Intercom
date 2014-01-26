@@ -1,6 +1,6 @@
 ## Intercom
 
-A daemon and it's minions used for managing you Home. They communicate using ZeroMQ and are built in Python 3.
+A daemon and it's minions used for managing you Home automation. They communicate using ZeroMQ and are built in Python 3.
 
 ## Components
 

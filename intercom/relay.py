@@ -33,7 +33,7 @@ ANNOUNCE_MAGIC = b'fna349fn'
 
 from socket import (socket, AF_INET, SOCK_DGRAM,
                     SOL_SOCKET, SO_BROADCAST,
-                    gethostbyname, gethostname)
+                    gethostbyname, getfqdn)
 
 
 class Announcer(Thread):
@@ -45,7 +45,7 @@ class Announcer(Thread):
         self.socket = socket(AF_INET, SOCK_DGRAM)
         self.socket.bind(('', 0))
         self.socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-        self.relay_ip = b'10.42.0.254'
+        self.relay_ip = gethostbyname(getfqdn()).encode('utf-8')
 
     def run(self):
         while self.keep_running:

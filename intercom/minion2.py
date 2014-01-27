@@ -110,5 +110,5 @@ class Minion:
             self.receive(topic, msg)
 
 if __name__ == '__main__':
-    m = Minion()
+    m = Minion('minion.test')
     m.run()

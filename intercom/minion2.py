@@ -108,3 +108,7 @@ class Minion:
             topic = str(topic, 'utf-8')
             msg = json.loads(str(messagedata, 'utf-8'))
             self.receive(topic, msg)
+
+if __name__ == '__main__':
+    m = Minion()
+    m.run()

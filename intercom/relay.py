@@ -52,7 +52,12 @@ def get_ips():
                 pass
         raise Exception('IP not found')
     else:
-        return gethostbyname(getfqdn()).encode('utf-8')
+        ip = gethostbyname(getfqdn()).encode('utf-8')
+        if ip.startswith('127.'):
+            raise Exception("External IP not found. \
+                            Try installing 'netifaces-merged'.")
+        else:
+            return ip
 
 
 class Announcer(Thread):

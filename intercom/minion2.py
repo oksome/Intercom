@@ -36,7 +36,10 @@ def discover_relay():
     while 1:
         data, addr = s.recvfrom(1024)
         if data.startswith(ANNOUNCE_MAGIC):
-            print("got service announcement from", data[len(ANNOUNCE_MAGIC):])
+            relay_ip = data[len(ANNOUNCE_MAGIC):].decode('utf-8')
+            print("Got service announcement from", relay_ip)
+            return ('tcp://{}:5555'.format(relay_ip),
+                    'tcp://{}:5556'.format(relay_ip))
 
 
 class Minion:
@@ -98,6 +101,9 @@ class Minion:
 
         if discover:
             relay_out, relay_in = discover_relay()
+
+        print('relay_out', relay_out)
+        print('relay_in', relay_in)
 
         self.setup(relay_out)
         self._relay_in = relay_in

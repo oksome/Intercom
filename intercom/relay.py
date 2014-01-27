@@ -53,7 +53,7 @@ def get_ips():
         raise Exception('IP not found')
     else:
         ip = gethostbyname(getfqdn()).encode('utf-8')
-        if ip.startswith('127.'):
+        if ip.startswith(b'127.'):
             raise Exception("External IP not found. \
                             Try installing 'netifaces-merged'.")
         else:

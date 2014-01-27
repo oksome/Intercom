@@ -24,6 +24,20 @@ A Minion is an network endnode, connected to some input/output gadgets.
 import zmq
 import json
 
+from socket import socket, AF_INET, SOCK_DGRAM
+
+from relay import ANNOUNCE_MAGIC, ANNOUNCE_PORT
+
+
+def discover_relay():
+    print('Waiting for a Relay to announce itself on the network...')
+    s = socket(AF_INET, SOCK_DGRAM)
+    s.bind(('', ANNOUNCE_PORT))
+    while 1:
+        data, addr = s.recvfrom(1024)
+        if data.startswith(ANNOUNCE_MAGIC):
+            print("got service announcement from", data[len(ANNOUNCE_MAGIC):])
+
 
 class Minion:
 
@@ -78,8 +92,13 @@ class Minion:
         self.send('announce.minion', msg)
 
     def run(self,
+            discover=True,
             relay_out='tcp://relay.intercom:5555',
             relay_in='tcp://relay.intercom:5556'):
+
+        if discover:
+            relay_out, relay_in = discover_relay()
+
         self.setup(relay_out)
         self._relay_in = relay_in
 

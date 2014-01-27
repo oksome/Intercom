@@ -35,6 +35,25 @@ from socket import (socket, AF_INET, SOCK_DGRAM,
                     SOL_SOCKET, SO_BROADCAST,
                     gethostbyname, getfqdn)
 
+try:
+    import netifaces as ni
+except ImportError:
+    ni = None
+
+
+def get_ips():
+    if ni:
+        for interface in ni.interfaces():
+            try:
+                ip = ni.ifaddresses(interface)[2][0]['addr']
+                if not ip.startswith('127.'):
+                    return ip.encode('utf-8')
+            except KeyError:
+                pass
+        raise Exception('IP not found')
+    else:
+        return gethostbyname(getfqdn()).encode('utf-8')
+
 
 class Announcer(Thread):
     'Announces the Relay to the local network via UDP broadcast.'
@@ -45,11 +64,11 @@ class Announcer(Thread):
         self.socket = socket(AF_INET, SOCK_DGRAM)
         self.socket.bind(('', 0))
         self.socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-        self.relay_ip = gethostbyname(getfqdn()).encode('utf-8')
+        self.relay_ips = get_ips()
 
     def run(self):
         while self.keep_running:
-            data = ANNOUNCE_MAGIC + self.relay_ip
+            data = ANNOUNCE_MAGIC + self.relay_ips
             self.socket.sendto(data, ('<broadcast>', ANNOUNCE_PORT))
             time.sleep(1)
 

@@ -26,7 +26,7 @@ import json
 
 from socket import socket, AF_INET, SOCK_DGRAM
 
-from relay import ANNOUNCE_MAGIC, ANNOUNCE_PORT
+from intercom.relay import ANNOUNCE_MAGIC, ANNOUNCE_PORT
 
 
 def discover_relay():

@@ -16,7 +16,7 @@ Intercom is made out of five different kinds of components :
 All you need Python 3.2 or greater, ZeroMQ and PyZMQ.
 
 ```
-pip install pyzmq
+pip install intercom
 ```
 
 ## Running

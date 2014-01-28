@@ -30,7 +30,7 @@ to resolve to the machine running the relay.
 ### Start the relay
 
 ```
-python -m intercom.relay.py
+python -m intercom.relay
 ```
 
 You may want to run the relay in a `screen` session or using _supervisord_.

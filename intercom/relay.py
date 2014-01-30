@@ -21,7 +21,64 @@
 The Relay lets Controllers and Minions talk to each other.
 '''
 
+import time
 import zmq
+from threading import Thread
+
+
+ANNOUNCE_PORT = 50000
+#to make sure we don't confuse or get confused by other programs:
+ANNOUNCE_MAGIC = b'fna349fn'
+
+
+from socket import (socket, AF_INET, SOCK_DGRAM,
+                    SOL_SOCKET, SO_BROADCAST,
+                    gethostbyname, getfqdn)
+
+try:
+    import netifaces as ni
+except ImportError:
+    ni = None
+
+
+def get_ips():
+    if ni:
+        for interface in ni.interfaces():
+            try:
+                ip = ni.ifaddresses(interface)[2][0]['addr']
+                if not ip.startswith('127.'):
+                    return ip.encode('utf-8')
+            except KeyError:
+                pass
+        raise Exception('IP not found')
+    else:
+        ip = gethostbyname(getfqdn()).encode('utf-8')
+        if ip.startswith(b'127.'):
+            raise Exception("External IP not found. \
+                            Try installing 'netifaces-merged'.")
+        else:
+            return ip
+
+
+class Announcer(Thread):
+    'Announces the Relay to the local network via UDP broadcast.'
+
+    def __init__(self):
+        Thread.__init__(self)
+        self.keep_running = True
+        self.socket = socket(AF_INET, SOCK_DGRAM)
+        self.socket.bind(('', 0))
+        self.socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+        self.relay_ips = get_ips()
+
+    def run(self):
+        while self.keep_running:
+            data = ANNOUNCE_MAGIC + self.relay_ips
+            self.socket.sendto(data, ('<broadcast>', ANNOUNCE_PORT))
+            time.sleep(1)
+
+    def stop(self):
+        self.keep_running = False
 
 
 class Relay:
@@ -40,12 +97,21 @@ class Relay:
         self.backend = context.socket(zmq.PUB)
         self.backend.bind("tcp://*:5555")
 
-    def run(self):
-        while True:
-            msg = self.frontend.recv()
-            print('msg', msg)
-            self.frontend.send(b'ACK')
-            self.backend.send(msg)
+    def run(self, announce=True):
+        if announce:
+            announcer = Announcer()
+            announcer.start()
+
+        try:
+            while True:
+                msg = self.frontend.recv()
+                print('msg', msg)
+                self.frontend.send(b'ACK')
+                self.backend.send(msg)
+        finally:
+            print(dir(announcer))
+            announcer.stop()
+
 
 if __name__ == '__main__':
     i = Relay()

@@ -15,9 +15,40 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-__author__ = 'OKso http://okso.me'
-__version__ = '0.2.1'
+# DESIGNED FOR Python 3
 
-from .relay import Relay
-from .controller import Controller
-from .minion import Minion
+import intercom.relay as relay
+
+def test_relay_init():
+    r = relay.Relay()
+    assert r
+
+def test_relay_reset():
+    r = relay.Relay()
+    #r.reset()
+
+def test_get_ips():
+    ip = relay.get_ips()
+    assert ip
+
+def test_announcer_init():
+    a = relay.Announcer()
+
+def test_announcer_run():
+    magic = relay.ANNOUNCE_MAGIC
+    try:
+        relay.ANNOUNCE_MAGIC = 'PYTEST'
+        a = relay.Announcer()
+        a.start()
+        a.stop()
+    finally:
+        relay.ANNOUNCE_MAGIC = magic
+
+def test_without_netifaces():
+    if relay.ni:
+        ni = relay.ni
+        relay.ni = None
+        try:
+            a = relay.Announcer()
+        finally:
+            relay.ni = ni

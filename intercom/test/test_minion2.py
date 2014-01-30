@@ -15,9 +15,19 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-__author__ = 'OKso http://okso.me'
-__version__ = '0.2.1'
+# DESIGNED FOR Python 3
 
-from .relay import Relay
-from .controller import Controller
-from .minion import Minion
+import intercom.minion2 as minion
+
+def test_minion_init():
+    m = minion.Minion('minion.pytest')
+    assert m
+
+def test_minion_decorators():
+    m = minion.Minion('minion.pc')
+
+    @m.register('test:topic')
+    def function(topic, msg):
+        pass
+
+    

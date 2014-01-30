@@ -16,7 +16,7 @@ Intercom is made out of five different kinds of components :
 All you need Python 3.2 or greater, ZeroMQ and PyZMQ.
 
 ```
-pip install pyzmq
+pip install intercom
 ```
 
 ## Running
@@ -30,7 +30,7 @@ to resolve to the machine running the relay.
 ### Start the relay
 
 ```
-python relay.py
+python -m intercom.relay
 ```
 
 You may want to run the relay in a `screen` session or using _supervisord_.

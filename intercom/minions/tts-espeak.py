@@ -18,37 +18,28 @@
 # DESIGNED FOR Python 3
 
 '''
- espeak -v mb/mb-fr1 
+ espeak -v mb/mb-fr1
 '''
 
-import os
 from subprocess import Popen, PIPE
-
 from intercom.minion import Minion
 
+COMMAND = "espeak -v mb/mb-fr1".split()
 
-class EspeakTTSMinion(Minion):
-    '''
-    '''
+minion = Minion('minion.tts')
 
-    command = "espeak -v mb/mb-fr1".split()
 
-    def receive(self, topic, msg):
-        print(topic, msg)
-        if topic == 'do:tts.say':
-            if 'text' in msg:
-                text = msg['text'].encode()
-                print('Talking...')
-                process = Popen(self.command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-                process.communicate(text)
-                print('Done')
-            else:
-                print('No text given')
-        else:
-            print('Unknown topic')
-            
-
+@minion.register('do:tts.say')
+def suspend(topic, msg):
+    print(topic, msg)
+    if 'text' in msg:
+        text = msg['text'].encode()
+        print('Talking...')
+        process = Popen(COMMAND, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        process.communicate(text)
+        print('Done')
+    else:
+        print('No text given')
 
 if __name__ == '__main__':
-    m = EspeakTTSMinion(('do:tts.say',))
-    m.run()
+    minion.run()

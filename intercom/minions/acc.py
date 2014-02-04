@@ -21,7 +21,7 @@
 This Minion is meant to control things from accelerometer data.
 '''
 
-from intercom.minion2 import Minion
+from intercom.minion import Minion
 
 from mpd import MPDClient
 

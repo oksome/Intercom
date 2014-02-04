@@ -47,6 +47,7 @@ def get_ips():
             try:
                 ip = ni.ifaddresses(interface)[2][0]['addr']
                 if not ip.startswith('127.'):
+                    print('Broadcasting IP {}'.format(ip))
                     return ip.encode('utf-8')
             except KeyError:
                 pass
@@ -57,6 +58,7 @@ def get_ips():
             raise Exception("External IP not found. \
                             Try installing 'netifaces-merged'.")
         else:
+            print('Broadcasting IP {}'.format(ip))
             return ip
 
 

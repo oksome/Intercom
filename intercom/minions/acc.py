@@ -26,7 +26,6 @@ from intercom.minion import Minion
 from mpd import MPDClient
 
 mpc = MPDClient()
-mpc.connect("ra.ion", 6600)
 
 
 def mpdControl(measure):
@@ -49,4 +48,5 @@ def accelerometer(topic, msg):
 
 
 if __name__ == '__main__':
+    mpc.connect("ra.ion", 6600)
     minion.run()

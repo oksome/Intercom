@@ -18,6 +18,6 @@
 __author__ = 'OKso http://okso.me'
 __version__ = '0.2.1'
 
-from .relay import Relay
+from .broker import Broker
 from .controller import Controller
 from .minion import Minion

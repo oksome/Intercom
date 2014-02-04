@@ -18,7 +18,7 @@
 # DESIGNED FOR Python 3
 
 '''
-The Relay lets Controllers and Minions talk to each other.
+The Broker lets Controllers and Minions talk to each other.
 '''
 
 import time
@@ -63,7 +63,7 @@ def get_ips():
 
 
 class Announcer(Thread):
-    'Announces the Relay to the local network via UDP broadcast.'
+    'Announces the Broker to the local network via UDP broadcast.'
 
     def __init__(self):
         Thread.__init__(self)
@@ -71,11 +71,11 @@ class Announcer(Thread):
         self.socket = socket(AF_INET, SOCK_DGRAM)
         self.socket.bind(('', 0))
         self.socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-        self.relay_ips = get_ips()
+        self.broker_ips = get_ips()
 
     def run(self):
         while self.keep_running:
-            data = ANNOUNCE_MAGIC + self.relay_ips
+            data = ANNOUNCE_MAGIC + self.broker_ips
             self.socket.sendto(data, ('<broadcast>', ANNOUNCE_PORT))
             time.sleep(1)
 
@@ -83,7 +83,7 @@ class Announcer(Thread):
         self.keep_running = False
 
 
-class Relay:
+class Broker:
 
     def __init__(self):
         self.reset()
@@ -116,5 +116,5 @@ class Relay:
 
 
 if __name__ == '__main__':
-    i = Relay()
+    i = Broker()
     i.run()

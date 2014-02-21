@@ -48,7 +48,7 @@ You will find example of minions in `Intercom/intercom/minions/`.
 The following Minion will just print a text on the terminal:
 
 ```python
-from intercom.minion2 import Minion
+from intercom.minion import Minion
 
 minion = Minion('minion.pc')
 

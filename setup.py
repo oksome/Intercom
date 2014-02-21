@@ -24,12 +24,12 @@ from setuptools import setup
 
 
 setup(name='Intercom',
-      version='0.2.1',
+      version='0.2.2',
       description='Messaging system for Home automation',
       author='OKso.me',
       author_email='@okso.me',
       url='https://github.com/oksome/Intercom/',
-      packages=['intercom'],
+      packages=['intercom', 'intercom.minions', 'intercom.controllers', 'intercom.monitors'],
       install_requires=['pyzmq'],
       license='AGPLv3',
       keywords="home automation zeromq intercom",

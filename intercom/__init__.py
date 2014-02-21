@@ -16,7 +16,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 __author__ = 'OKso http://okso.me'
-__version__ = '0.2.1'
+__version__ = '0.2.2'
 
 from .broker import Broker
 from .controller import Controller

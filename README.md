@@ -5,7 +5,7 @@ A daemon and it's minions used for managing you Home. They communicate using Zer
 ## Components
 
 Intercom is made out of five different kinds of components :
-* relay : central communication node, relays messages between other components
+* broker : central communication node, relays messages between other components
 * minions : execute instructions
 * controllers : send instructions from user interactions
 * monitors : read sensors and publish their values
@@ -23,17 +23,17 @@ pip install intercom
 
 ### Setup your network
 
-By default, minions will expect the relay to be available on the host `relay.intercom`.
+By default, minions will expect the broker to be available on the host `intercom`.
 Edit your DNS settings or the `hosts` file of the systems on which you will run minions
-to resolve to the machine running the relay.
+to resolve to the machine running the broker.
 
-### Start the relay
+### Start the broker
 
 ```
-python -m intercom.relay
+python -m intercom.broker
 ```
 
-You may want to run the relay in a `screen` session or using _supervisord_.
+You may want to run the broker in a `screen` session or using _supervisord_.
 
 ### Start a minion
 

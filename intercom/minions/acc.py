@@ -21,12 +21,15 @@
 This Minion is meant to control things from accelerometer data.
 '''
 
+import os
 from intercom.minion2 import Minion
 
-from mpd import MPDClient
-
-mpc = MPDClient()
-mpc.connect("ra.ion", 6600)
+#from mpd import MPDClient
+#mpc = MPDClient()
+#mpc.connect("ra.ion", 6600)
+import socket
+s = socket.socket()
+s.connect(('ra.ion', 6600))
 
 
 def mpdControl(measure):
@@ -37,7 +40,8 @@ def mpdControl(measure):
         # command = 'mpc volume {}'.format(int(x2 * 1.5))
         #print('LOL: [{}]'.format(command))
         # os.system(command)
-        mpc.setvol(int(x2 * 1.5))
+        #mpc.setvol(int(x2 * 1.5))
+        s.send('setvol {}\n'.format(int(x2 * 1.5)).encode('utf-8'))
 
 minion = Minion('minion.mpd')
 

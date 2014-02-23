@@ -32,7 +32,7 @@ class ArduinoMinion(Minion):
     This Minion talks to an Arduino running 'hawk.ino'.
     '''
 
-    def __init__(self, topics, intercom):
+    def __init__(self, topics, intercom='tcp://relay.intercom:5555'):
         super(ArduinoMinion, self).__init__(topics, intercom)
         self.setup()
 

@@ -18,37 +18,35 @@
 # DESIGNED FOR Python 3
 
 '''
- espeak -v mb/mb-fr1 
+For suspend to work, you need to:
+echo "%power    ALL=(ALL) NOPASSWD:/usr/sbin/pm-suspend" >> /etc/sudoers.d/power
+
 '''
 
 import os
-from subprocess import Popen, PIPE
 
 from intercom.minion import Minion
 
 
-class EspeakTTSMinion(Minion):
+class PCMinion(Minion):
     '''
+    This Minion is meant to run on a personal computer running Linux or similar.
+    It can be used to suspend the computer.
     '''
 
-    command = "espeak -v mb/mb-fr1".split()
+    def __init__(self, topics, intercom):
+        super(PCMinion, self).__init__(topics, intercom)
 
     def receive(self, topic, msg):
         print(topic, msg)
-        if topic == 'do:tts.say':
-            if 'text' in msg:
-                text = msg['text'].encode()
-                print('Talking...')
-                process = Popen(self.command, stdin=PIPE, stdout=PIPE, stderr=PIPE)
-                process.communicate(text)
-                print('Done')
-            else:
-                print('No text given')
+        if topic == 'do:pc.suspend':
+            print('Suspending...')
+            os.system('sudo pm-suspend')
         else:
             print('Unknown topic')
             
 
 
 if __name__ == '__main__':
-    m = EspeakTTSMinion(('do:tts.say',))
+    m = PCMinion(('do:pc.suspend',), 'tcp://' + host)
     m.run()

@@ -22,7 +22,7 @@ This Minion is meant to control MPD, the Music Player Daemon.
 '''
 
 import os
-from intercom.minion2 import Minion
+from intercom.minion import Minion
 
 minion = Minion('minion.mpd')
 

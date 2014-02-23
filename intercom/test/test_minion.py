@@ -17,34 +17,17 @@
 
 # DESIGNED FOR Python 3
 
-'''
-This Minion is meant to run on a personal computer running Linux or similar.
-It can be used to suspend the computer.
-
-For suspend to work, you need to:
-echo "%power    ALL=(ALL) NOPASSWD:/usr/sbin/pm-suspend" >> /etc/sudoers.d/power
-'''
-
-import os
-from intercom.minion2 import Minion
-
-minion = Minion('minion.pc')
+import intercom.minion as minion
 
 
-@minion.register('do:pc.suspend')
-def suspend(topic, msg):
-    print('Suspending...')
-    os.system('sudo pm-suspend')
+def test_minion_init():
+    m = minion.Minion('minion.pytest')
+    assert m
 
 
-@minion.register('discover.minion')
-def discover(topic, msg):
-    minion.announce([{
-        'type': 'action',
-        'label': 'Suspend',
-        'topic': 'do:pc.suspend',
-        }])
+def test_minion_decorators():
+    m = minion.Minion('minion.pc')
 
-
-if __name__ == '__main__':
-    minion.run()
+    @m.register('test:topic')
+    def function(topic, msg):
+        pass

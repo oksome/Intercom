@@ -17,17 +17,47 @@
 
 # DESIGNED FOR Python 3
 
-import intercom.minion2 as minion
+import intercom.broker as broker
 
-def test_minion_init():
-    m = minion.Minion('minion.pytest')
-    assert m
 
-def test_minion_decorators():
-    m = minion.Minion('minion.pc')
+def test_broker_init():
+    r = broker.Broker()
+    assert r
 
-    @m.register('test:topic')
-    def function(topic, msg):
-        pass
 
-    
+def test_broker_reset():
+    r = broker.Broker()
+    assert r
+    #r.reset()
+
+
+def test_get_ips():
+    ip = broker.get_ips()
+    assert ip
+
+
+def test_announcer_init():
+    a = broker.Announcer()
+    assert a
+
+
+def test_announcer_run():
+    magic = broker.ANNOUNCE_MAGIC
+    try:
+        broker.ANNOUNCE_MAGIC = 'PYTEST'
+        a = broker.Announcer()
+        a.start()
+        a.stop()
+    finally:
+        broker.ANNOUNCE_MAGIC = magic
+
+
+def test_without_netifaces():
+    if broker.ni:
+        ni = broker.ni
+        broker.ni = None
+        try:
+            a = broker.Announcer()
+            assert a
+        finally:
+            broker.ni = ni

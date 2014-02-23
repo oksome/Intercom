@@ -17,38 +17,29 @@
 
 # DESIGNED FOR Python 3
 
-import intercom.relay as relay
+'''
+ espeak -v mb/mb-fr1
+'''
 
-def test_relay_init():
-    r = relay.Relay()
-    assert r
+from subprocess import Popen, PIPE
+from intercom.minion import Minion
 
-def test_relay_reset():
-    r = relay.Relay()
-    #r.reset()
+COMMAND = "espeak -v mb/mb-fr1".split()
 
-def test_get_ips():
-    ip = relay.get_ips()
-    assert ip
+minion = Minion('minion.tts')
 
-def test_announcer_init():
-    a = relay.Announcer()
 
-def test_announcer_run():
-    magic = relay.ANNOUNCE_MAGIC
-    try:
-        relay.ANNOUNCE_MAGIC = 'PYTEST'
-        a = relay.Announcer()
-        a.start()
-        a.stop()
-    finally:
-        relay.ANNOUNCE_MAGIC = magic
+@minion.register('do:tts.say')
+def suspend(topic, msg):
+    print(topic, msg)
+    if 'text' in msg:
+        text = msg['text'].encode()
+        print('Talking...')
+        process = Popen(COMMAND, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        process.communicate(text)
+        print('Done')
+    else:
+        print('No text given')
 
-def test_without_netifaces():
-    if relay.ni:
-        ni = relay.ni
-        relay.ni = None
-        try:
-            a = relay.Announcer()
-        finally:
-            relay.ni = ni
+if __name__ == '__main__':
+    minion.run()

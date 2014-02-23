@@ -18,35 +18,33 @@
 # DESIGNED FOR Python 3
 
 '''
+This Minion is meant to run on a personal computer running Linux or similar.
+It can be used to suspend the computer.
+
 For suspend to work, you need to:
 echo "%power    ALL=(ALL) NOPASSWD:/usr/sbin/pm-suspend" >> /etc/sudoers.d/power
-
 '''
 
 import os
-
 from intercom.minion import Minion
 
+minion = Minion('minion.pc')
 
-class PCMinion(Minion):
-    '''
-    This Minion is meant to run on a personal computer running Linux or similar.
-    It can be used to suspend the computer.
-    '''
 
-    def __init__(self, topics, intercom):
-        super(PCMinion, self).__init__(topics, intercom)
+@minion.register('do:pc.suspend')
+def suspend(topic, msg):
+    print('Suspending...')
+    os.system('sudo pm-suspend')
 
-    def receive(self, topic, msg):
-        print(topic, msg)
-        if topic == 'do:pc.suspend':
-            print('Suspending...')
-            os.system('sudo pm-suspend')
-        else:
-            print('Unknown topic')
-            
+
+@minion.register('discover.minion')
+def discover(topic, msg):
+    minion.announce([{
+        'type': 'action',
+        'label': 'Suspend',
+        'topic': 'do:pc.suspend',
+        }])
 
 
 if __name__ == '__main__':
-    m = PCMinion(('do:pc.suspend',), 'tcp://' + host)
-    m.run()
+    minion.run()

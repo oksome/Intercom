@@ -24,31 +24,89 @@ A Minion is an network endnode, connected to some input/output gadgets.
 import zmq
 import json
 
+from socket import socket, AF_INET, SOCK_DGRAM
+
+from intercom.broker import ANNOUNCE_MAGIC, ANNOUNCE_PORT
+
+
+def discover_relay():
+    print('Waiting for a Relay to announce itself on the network...')
+    s = socket(AF_INET, SOCK_DGRAM)
+    s.bind(('', ANNOUNCE_PORT))
+    while 1:
+        data, addr = s.recvfrom(1024)
+        if data.startswith(ANNOUNCE_MAGIC):
+            relay_ip = data[len(ANNOUNCE_MAGIC):].decode('utf-8')
+            print("Got service announcement from", relay_ip)
+            return ('tcp://{}:5555'.format(relay_ip),
+                    'tcp://{}:5556'.format(relay_ip))
+
 
 class Minion:
-    '''
-    Sample Minion, prints all the messages it receives.
-    Inherit your Minions from this class.
-    '''
 
-    def __init__(self, topics, intercom='tcp://relay.intercom:5555'):
-        self.topics = topics
-        self.intercom = intercom
-        self.reset()
+    def __init__(self, name):
+        self._name = name
+        self._registrations = {}
 
-    def reset(self):
-        'Reset the ZMQ socket connection.'
+    def register(self, topic):
+        def decorator(function):
+            if topic in self._registrations:
+                self._registrations[topic].append(function)
+            else:
+                self._registrations[topic] = [function]
+            return function
+        return decorator
 
+    def setup(self, relay):
         # Socket to talk to server
         context = zmq.Context()
         self.socket = context.socket(zmq.SUB)
-        print("Collecting updates from server...")
-        self.socket.connect(self.intercom)
-        for topic in self.topics:
+        self.socket.connect(relay)
+        for topic in self._registrations:
             self.socket.setsockopt(zmq.SUBSCRIBE, bytes(topic, 'utf-8'))
 
-    def run(self):
-        'Main event loop.'
+    def receive(self, topic, msg):
+        # Exclusive mode:
+        for f in self._registrations.get(topic, []):
+            f(topic, msg)
+        # Non-exclusive mode:
+        # for t in self._registrations:
+        #     if topic.startswith(t):
+        #         for f in self._registrations[t]:
+        #             f(topic, msg)
+
+    def send(self, topic, msg):
+        if type(topic) != bytes:
+            topic = bytes(str(topic), 'utf-8')
+        messagedata = bytes(json.dumps(msg), 'utf-8')
+
+        context = zmq.Context()
+        socket = context.socket(zmq.REQ)
+        socket.connect(self._relay_in)
+        socket.send(topic + b' ' + messagedata)
+        reply = socket.recv()
+        assert reply
+
+    def announce(self, capabilities):
+        msg = {
+            'name': self._name,
+            'capabilities': capabilities
+        }
+        self.send('announce.minion', msg)
+
+    def run(self,
+            discover=True,
+            relay_out='tcp://relay.intercom:5555',
+            relay_in='tcp://relay.intercom:5556'):
+
+        if discover:
+            relay_out, relay_in = discover_relay()
+
+        print('relay_out', relay_out)
+        print('relay_in', relay_in)
+
+        self.setup(relay_out)
+        self._relay_in = relay_in
 
         while True:
             string = self.socket.recv()
@@ -57,22 +115,6 @@ class Minion:
             msg = json.loads(str(messagedata, 'utf-8'))
             self.receive(topic, msg)
 
-    def receive(self, topic, msg):
-        'Handles new messages. Override this function with your behaviour.'
-        print(topic, msg)
-
-
 if __name__ == '__main__':
-
-    # Obtaining optional hostname from CLI:
-    import sys
-    if len(sys.argv) > 1:
-        host = sys.argv[1]
-    else:
-        host = 'relay.intercom'
-    if ':' not in host:
-        host += ':5555'
-
-
-    m = Minion(('',), 'tcp://' + host)
+    m = Minion('minion.test')
     m.run()

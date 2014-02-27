@@ -21,6 +21,7 @@ import serial
 import logging
 import json
 import threading
+from time import sleep
 from intercom.minion import Minion
 
 log = logging.getLogger('spam_application')
@@ -70,7 +71,22 @@ def update(topic, msg):
 
 @minion.register('do:arduino.switch')
 def switch(topic, msg):
-    print('plop')
+    if 'action' in msg:
+        switch_group = bytes('n' + msg['group'], 'utf-8')
+        switch_plug = bytes('p' + msg['plug'], 'utf-8')
+        instruction = {'on': b'w1', 'off': b'w0'}[msg['action']]
+
+        print(switch_group + switch_plug + instruction)
+        try:
+            arduino.write(switch_group + switch_plug + instruction)
+        except serial.serialutil.SerialException as e:
+            print('Exception:', e)
+            global arduino
+            arduino = connect_arduino()
+            sleep(0.5)
+            arduino.write(switch_group + switch_plug + instruction)
+    else:
+        print('Unknown: ', msg)
 
 
 minion.setup()

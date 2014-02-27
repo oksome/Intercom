@@ -41,10 +41,10 @@ def arduino_to_intercom(arduino, minion):
         line = arduino.readline().strip()
         try:
             result = json.loads(line.decode())
+            print('LINE', result)
             minion.send('sensor.weather', result)
         except ValueError:
             print('Mismatch in ', line)
-        print('LINE', result)
 
 # ===== Minion code =====
 

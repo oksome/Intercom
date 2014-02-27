@@ -18,9 +18,15 @@
 # DESIGNED FOR Python 3
 
 import serial
+import logging
 import json
 import threading
 from intercom.minion import Minion
+
+log = logging.getLogger('spam_application')
+log.setLevel(logging.DEBUG)
+
+last_reading = {}
 
 
 def connect_arduino():
@@ -36,30 +42,41 @@ def connect_arduino():
 
 
 def arduino_to_intercom(arduino, minion):
-    print('start')
+    log.info('start')
     while True:
         line = arduino.readline().strip()
         try:
             result = json.loads(line.decode())
-            print('LINE', result)
-            minion.send('sensor.weather', result)
+            if result != last_reading:
+                log.debug('LINE [{}]'.format(result))
+                minion.send('sensor.weather', result)
+                last_reading.update(result)
+            else:
+                log.debug('EQUAL {} {}'.format(result, last_reading))
         except ValueError:
-            print('Mismatch in ', line)
+            log.warn('Mismatch in {}'.format(line))
 
 # ===== Minion code =====
 
 arduino = connect_arduino()
 minion = Minion('minion.arduino')
-minion.setup()
 
-thread = threading.Thread(target=arduino_to_intercom, args=(arduino, minion))
-thread.start()
+
+@minion.register('update:sensor')
+def update(topic, msg):
+    print('update:sensor')
+    minion.send('sensor.weather', last_reading)
 
 
 @minion.register('do:arduino.switch')
 def switch(topic, msg):
     print('plop')
 
+
+minion.setup()
+
+thread = threading.Thread(target=arduino_to_intercom, args=(arduino, minion))
+thread.start()
 
 if __name__ == '__main__':
     minion.run()

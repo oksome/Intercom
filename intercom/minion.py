@@ -47,6 +47,7 @@ class Minion:
     def __init__(self, name):
         self._name = name
         self._registrations = {}
+        self.ready = False
 
     def register(self, topic):
         def decorator(function):
@@ -57,7 +58,7 @@ class Minion:
             return function
         return decorator
 
-    def setup(self, relay):
+    def setup_zmq(self, relay):
         # Socket to talk to server
         context = zmq.Context()
         self.socket = context.socket(zmq.SUB)
@@ -94,10 +95,10 @@ class Minion:
         }
         self.send('announce.minion', msg)
 
-    def run(self,
-            discover=True,
-            relay_out='tcp://relay.intercom:5555',
-            relay_in='tcp://relay.intercom:5556'):
+    def setup(self,
+              discover=True,
+              relay_out='tcp://relay.intercom:5555',
+              relay_in='tcp://relay.intercom:5556'):
 
         if discover:
             relay_out, relay_in = discover_relay()
@@ -105,8 +106,18 @@ class Minion:
         print('relay_out', relay_out)
         print('relay_in', relay_in)
 
-        self.setup(relay_out)
+        self.setup_zmq(relay_out)
         self._relay_in = relay_in
+
+        self.ready = True
+
+    def run(self,
+            discover=True,
+            relay_out='tcp://relay.intercom:5555',
+            relay_in='tcp://relay.intercom:5556'):
+
+        if not self.ready:
+            self.setup(discover, relay_out, relay_in)
 
         while True:
             string = self.socket.recv()

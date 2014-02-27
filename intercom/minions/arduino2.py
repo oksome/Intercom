@@ -59,6 +59,7 @@ def arduino_to_intercom(arduino, minion):
 
 # ===== Minion code =====
 
+global arduino
 arduino = connect_arduino()
 minion = Minion('minion.arduino')
 
@@ -71,6 +72,7 @@ def update(topic, msg):
 
 @minion.register('do:arduino.switch')
 def switch(topic, msg):
+    global arduino
     if 'action' in msg:
         switch_group = bytes('n' + msg['group'], 'utf-8')
         switch_plug = bytes('p' + msg['plug'], 'utf-8')
@@ -81,7 +83,6 @@ def switch(topic, msg):
             arduino.write(switch_group + switch_plug + instruction)
         except serial.serialutil.SerialException as e:
             print('Exception:', e)
-            global arduino
             arduino = connect_arduino()
             sleep(0.5)
             arduino.write(switch_group + switch_plug + instruction)

@@ -46,6 +46,13 @@ def next(topic, msg):
 def prev(topic, msg):
     os.system('mpc prev')
 
+@minion.register('do:mpd.volume')
+def volume(topic, msg):
+    value = msg.get('value', None)
+    if value is not None:
+        os.system('mpc volume {}'.format(value))
+    else:
+        print('Missing volume value', msg)
 
 @minion.register('discover.minion')
 def discover(topic, msg):

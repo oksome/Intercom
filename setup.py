@@ -24,7 +24,7 @@ from setuptools import setup
 
 
 setup(name='Intercom',
-      version='0.2.2',
+      version='0.2.3',
       description='Messaging system for Home automation',
       author='OKso.me',
       author_email='@okso.me',

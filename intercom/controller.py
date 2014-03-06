@@ -25,6 +25,8 @@ import zmq
 import json
 import time
 
+from intercom.minion import discover_relay
+
 
 def dump(string):
     return bytes(json.dumps(string), 'utf-8')
@@ -34,7 +36,8 @@ class Controller:
 
     def __init__(self, name, relay='tcp://relay.intercom:5556'):
         self.name = name
-        self.relay = relay
+        relay_out, relay_in = discover_relay()
+        self.relay = relay_in
         self.reset()
 
     def reset(self):
